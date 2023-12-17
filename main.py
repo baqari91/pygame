@@ -81,10 +81,9 @@ class Bullet:
 
         # Check collision with enemies
         for enemy in enemies:
-            if self.rect.colliderect(enemy.rect):  # Check for collision between bullet and enemy
-                # Handle collision logic here (e.g., decrease enemy health, remove bullet)
+            if self.rect.colliderect(enemy.rect):
                 enemies.remove(enemy)
-                player_bullets.remove(self)  # Remove the bullet on collision
+                player_bullets.remove(self)
 
 
 class EnemyBullet(Bullet):
@@ -93,7 +92,10 @@ class EnemyBullet(Bullet):
         screen.blit(self.image, self.rect)
 
         if self.rect.colliderect(player.rect):
-            var = player.health - 1
+            player.health -= 10
+            enemy_bullets.remove(self)
+            if player.health == 0:
+                sys.exit()
 
 
 
@@ -121,7 +123,7 @@ class Enemy:
             self.rect.x = random.randint(-width, -self.size)
 
     def shoot(self):
-        bullet = EnemyBullet(self.rect.centerx, self.rect.bottom, 5, bullet_image)  # Create a bullet below the enemy
+        bullet = EnemyBullet(self.rect.centerx, self.rect.bottom, 10, bullet_image)  # Create a bullet below the enemy
         enemy_bullets.append(bullet)  # Add bullet to the list
 
     def update(self):
@@ -183,10 +185,8 @@ while run:
 
     for bullet in enemy_bullets:
         bullet.update()
-        for bullet in enemy_bullets[:]:  # Iterate over a copy of the list to avoid modifying it during iteration
-            bullet.update()
-            if bullet.rect.bottom < 0:
-              enemy_bullets.remove(bullet)
+        if bullet.rect.bottom < 0:
+            enemy_bullets.remove(bullet)
 
     for bullet in player_bullets:
         bullet.update()
