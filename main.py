@@ -38,6 +38,7 @@ class Player:
         self.cur_speed_w = 0
         self.cur_speed_h = 0
         self.health = health
+        self.score = 0
 
     def draw_player(self):
         if self.cur_speed_w < 0:
@@ -84,6 +85,9 @@ class Bullet:
             if self.rect.colliderect(enemy.rect):
                 enemies.remove(enemy)
                 player_bullets.remove(self)
+                player.score += 1
+                if player.score >= 10:
+                    sys.exit()
 
 
 class EnemyBullet(Bullet):
@@ -96,7 +100,6 @@ class EnemyBullet(Bullet):
             enemy_bullets.remove(self)
             if player.health == 0:
                 sys.exit()
-
 
 
 class Enemy:
@@ -131,40 +134,45 @@ class Enemy:
         self.move_enemy()
 
 
-
 class EnemyRight(Enemy):
     def move_enemy(self):
-        self.rect.width -= self.speed
-        if self.rect.width == self.rect.x:
-            self.rect.y - random.randint(0, height//2 - self.size)
-            self.rect.x = random.randint(-width, -self.size)
 
-
-
-
+        self.rect.x -= self.speed
+        if self.rect.x < 0:
+            self.rect.y - random.randint(0, height//2)
+            self.rect.x = width*2
 
 
 def player_shoot():
-    bullet = Bullet(player.rect.centerx, player.rect.y, 20, bullet_image)  # Create bullet at player's position
-    player_bullets.append(bullet)  # Add bullet to the list
+    bullet = Bullet(player.rect.centerx, player.rect.y, 20, bullet_image)
+    player_bullets.append(bullet)
 
 
-def show_health():
+def show_info():
     health_text = font.render(f'Health: {player.health}', True, (255, 255, 255))
+    score_text = font.render(f'Score: {player.score}', True, (255, 255, 255))
     screen.blit(health_text, (10, 10))
+    screen.blit(score_text, (10, 50))
 
 
-
-enemy_bullets = []  # List to store enemy bullets
-player_bullets = []  # List to store player's bullets
+enemy_bullets = []
+player_bullets = []
 
 enemy1 = Enemy(10, 60, 100, enemy_image)
 enemy2 = Enemy(10, 60, 100, enemy_image)
 enemy3 = Enemy(10, 60, 100, enemy_image)
 enemy4 = Enemy(10, 60, 100, enemy_image)
-enemy5 = Enemy(-10, 60, 100, enemy_image)
+enemy5 = Enemy(10, 60, 100, enemy_image)
+enemy6 = EnemyRight(10, 60, 100, enemy_image)
+enemy7 = EnemyRight(10, 60, 100, enemy_image)
+enemy8 = EnemyRight(10, 60, 100, enemy_image)
+enemy9 = EnemyRight(10, 60, 100, enemy_image)
+enemy10 = EnemyRight(10, 60, 100, enemy_image)
+enemy11 = Enemy(10, 60, 100, enemy_image)
+enemy12 = EnemyRight(10, 60, 100, enemy_image)
 
-enemies = [enemy1, enemy2, enemy3, enemy4, enemy5]  # List to store enemy instances
+
+enemies = [enemy1, enemy2, enemy3, enemy4, enemy5, enemy6, enemy7, enemy8, enemy9, enemy10, enemy11, enemy12,]  # List to store enemy instances
 
 player = Player(10, 60, 100, player_image)
 
@@ -175,12 +183,13 @@ while run:
     # screen.fill(red)
     screen.blit(background_image, (0, 0))
     player.update()
-    show_health()
+    show_info()
 
     for enemy in enemies:
         enemy.update()
-        if random.randint(1, 100) == 1:  # Adjust this probability to control enemy firing rate
+        if random.randint(1, 100) == 1:
             enemy.shoot()
+
 
 
     for bullet in enemy_bullets:
@@ -190,7 +199,7 @@ while run:
 
     for bullet in player_bullets:
         bullet.update()
-        for bullet in player_bullets[:]:  # Iterate over a copy of the list to avoid modifying it during iteration
+        for bullet in player_bullets[:]:
             bullet.update()
             if bullet.rect.bottom < 0:
                 player_bullets.remove(bullet)
